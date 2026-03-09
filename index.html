@@ -97,7 +97,7 @@
             align-items: center;
             opacity: 0;
             transform: translateX(50px) scale(0.9);
-            pointer-events: none; /* Prevent clicking hidden cards */
+            pointer-events: none;
         }
 
         .card.active {
@@ -192,14 +192,14 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* --- Start Overlay (Required for Audio Autoplay) --- */
+        /* --- Start Overlay --- */
         #start-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 999;
             display: flex;
             flex-direction: column;
@@ -212,13 +212,36 @@
         #start-overlay h1 {
             color: #ff99cc;
             font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #start-overlay p {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .hidden {
             opacity: 0;
             pointer-events: none;
         }
-
     </style>
 </head>
 <body>
@@ -231,8 +254,7 @@
         <span id="music-icon">🎵</span>
     </div>
 
-    <!-- Audio Element (Using a royalty free romantic track) -->
-    <!-- Note: Replace src with your own file if desired -->
+    <!-- Audio Element -->
     <audio id="bg-music" loop>
         <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_9939f792cb.mp3?filename=romantic-piano-123256.mp3" type="audio/mpeg">
     </audio>
@@ -240,7 +262,8 @@
     <!-- Start Overlay -->
     <div id="start-overlay">
         <h1>For My Love, Fiza ❤️</h1>
-        <p style="color: #ccc; margin-top: 10px;">Tap anywhere to begin</p>
+        <p>Tap the button below to begin</p>
+        <button class="start-btn" onclick="startExperience()">Begin Our Story</button>
     </div>
 
     <!-- Main Card Container -->
@@ -294,7 +317,36 @@
         const musicIcon = document.getElementById('music-icon');
         let isPlaying = false;
 
-        // --- Background Animation (Stars & Hearts) ---
+        // --- Start Experience ---
+        function startExperience() {
+            const overlay = document.getElementById('start-overlay');
+            overlay.classList.add('hidden');
+            
+            // Play music
+            music.volume = 0.5;
+            music.play().then(() => {
+                isPlaying = true;
+                musicIcon.textContent = '🔊';
+            }).catch(error => {
+                console.log('Audio play failed:', error);
+                musicIcon.textContent = '🔇';
+            });
+        }
+
+        // --- Music Toggle ---
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicIcon.textContent = '🔇';
+                isPlaying = false;
+            } else {
+                music.play();
+                musicIcon.textContent = '🔊';
+                isPlaying = true;
+            }
+        }
+
+        // --- Background Animation ---
         function createBackgroundElements() {
             const container = document.getElementById('bg-elements');
             const starCount = 50;
@@ -324,7 +376,7 @@
             }
         }
 
-        // --- Slide Logic ---
+        // --- Slide Navigation ---
         function nextSlide() {
             const currentCard = document.getElementById(`slide-${currentSlide}`);
             const nextCard = document.getElementById(`slide-${currentSlide + 1}`);
@@ -336,9 +388,21 @@
 
                 // Wait for animation to finish before showing next
                 setTimeout(() => {
-                    currentCard.classList.remove('exit'); // Reset exit class
+                    currentCard.classList.remove('exit');
                     
                     // Show next
                     nextCard.classList.add('active');
                     
-                   
+                    // Update current slide
+                    currentSlide++;
+                }, 600);
+            }
+        }
+
+        // --- Initialize ---
+        window.onload = function() {
+            createBackgroundElements();
+        };
+    </script>
+</body>
+</html>
